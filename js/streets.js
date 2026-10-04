@@ -37,9 +37,9 @@ export function buildStreets(scene) {
   group.add(roundabout);
 
   // Vạch kẻ bùng binh (vòng tròn đứt)
-  addDashedCircle(group, (MAP.plazaR + MAP.roundaboutOuter) / 2, y + 0.05, lineMat);
+  addDashedCircle(group, (MAP.plazaR + MAP.roundaboutOuter) / 2, y + 0.02, lineMat);
 
-  // 3. 3 đường vành đai
+  // 3. 5 đường vành đai
   for (const r of MAP.rings) {
     const ring = new THREE.Mesh(
       new THREE.RingGeometry(r - MAP.ringWidth / 2, r + MAP.ringWidth / 2, 96), roadMat);
@@ -49,37 +49,39 @@ export function buildStreets(scene) {
     group.add(ring);
 
     // Vạch tim đường đứt
-    addDashedCircle(group, r, y + 0.05, lineMat);
+    addDashedCircle(group, r, y + 0.02, lineMat);
     // Vạch biên liền 2 mép
     for (const er of [r - MAP.ringWidth / 2 + 0.3, r + MAP.ringWidth / 2 - 0.3]) {
       const edge = new THREE.Mesh(new THREE.RingGeometry(er - 0.15, er + 0.15, 96),
         new THREE.MeshBasicMaterial({ color: 0xf5f5f5 }));
       edge.rotation.x = -Math.PI / 2;
-      edge.position.y = y + 0.05;
+      edge.position.y = y + 0.02;
       group.add(edge);
     }
   }
 
-  // 4. 8 đường xuyên tâm
+  // 4. 12 đường xuyên tâm (mặt phẳng, cao hơn vành đai để không đánh nhau ở ngã tư)
+  const radialY = y + 0.04;
   for (let i = 0; i < MAP.radials; i++) {
     const ang = (i / MAP.radials) * Math.PI * 2;
     const len = MAP.radius - MAP.roundaboutOuter;
     const mid = MAP.roundaboutOuter + len / 2;
 
     const road = new THREE.Mesh(
-      new THREE.BoxGeometry(MAP.radialWidth, 0.2, len), roadMat);
-    road.position.set(Math.cos(ang) * mid, y, Math.sin(ang) * mid);
-    road.rotation.y = -ang + Math.PI / 2;
+      new THREE.PlaneGeometry(MAP.radialWidth, len), roadMat);
+    road.rotation.x = -Math.PI / 2;
+    road.rotation.z = ang;
+    road.position.set(Math.cos(ang) * mid, radialY, Math.sin(ang) * mid);
     road.receiveShadow = true;
     group.add(road);
 
-    // Vạch tim đứt
+    // Vạch tim đứt (trên mặt đường xuyên tâm)
     const dashCount = Math.floor(len / 6);
     for (let d = 0; d < dashCount; d++) {
       const t = MAP.roundaboutOuter + 3 + d * 6;
       if (t > MAP.radius - 3) break;
       const dash = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.02, 2.5), lineMat);
-      dash.position.set(Math.cos(ang) * t, y + 0.05, Math.sin(ang) * t);
+      dash.position.set(Math.cos(ang) * t, radialY + 0.02, Math.sin(ang) * t);
       dash.rotation.y = -ang + Math.PI / 2;
       group.add(dash);
     }
