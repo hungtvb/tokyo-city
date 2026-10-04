@@ -36,8 +36,8 @@ export function buildStreets(scene) {
   roundabout.receiveShadow = true;
   group.add(roundabout);
 
-  // Vạch kẻ bùng binh (vòng tròn đứt)
-  addDashedCircle(group, (MAP.plazaR + MAP.roundaboutOuter) / 2, y + 0.02, lineMat);
+  // TẠM TẮT vạch kẻ đường (2500+ mesh quá nặng iPhone) — bật lại khi tối ưu bằng InstancedMesh
+  // addDashedCircle(group, (MAP.plazaR + MAP.roundaboutOuter) / 2, y + 0.02, lineMat);
 
   // 3. 5 đường vành đai
   for (const r of MAP.rings) {
@@ -48,16 +48,15 @@ export function buildStreets(scene) {
     ring.receiveShadow = true;
     group.add(ring);
 
-    // Vạch tim đường đứt
-    addDashedCircle(group, r, y + 0.02, lineMat);
-    // Vạch biên liền 2 mép
-    for (const er of [r - MAP.ringWidth / 2 + 0.3, r + MAP.ringWidth / 2 - 0.3]) {
-      const edge = new THREE.Mesh(new THREE.RingGeometry(er - 0.15, er + 0.15, 96),
-        new THREE.MeshBasicMaterial({ color: 0xf5f5f5 }));
-      edge.rotation.x = -Math.PI / 2;
-      edge.position.y = y + 0.02;
-      group.add(edge);
-    }
+    // TẠM TẮT vạch kẻ vành đai — bật lại khi tối ưu bằng InstancedMesh
+    // addDashedCircle(group, r, y + 0.02, lineMat);
+    // for (const er of [r - MAP.ringWidth / 2 + 0.3, r + MAP.ringWidth / 2 - 0.3]) {
+    //   const edge = new THREE.Mesh(new THREE.RingGeometry(er - 0.15, er + 0.15, 96),
+    //     new THREE.MeshBasicMaterial({ color: 0xf5f5f5 }));
+    //   edge.rotation.x = -Math.PI / 2;
+    //   edge.position.y = y + 0.02;
+    //   group.add(edge);
+    // }
   }
 
   // 4. 12 đường xuyên tâm (mặt phẳng, cao hơn vành đai để không đánh nhau ở ngã tư)
@@ -75,16 +74,16 @@ export function buildStreets(scene) {
     road.receiveShadow = true;
     group.add(road);
 
-    // Vạch tim đứt (trên mặt đường xuyên tâm)
-    const dashCount = Math.floor(len / 6);
-    for (let d = 0; d < dashCount; d++) {
-      const t = MAP.roundaboutOuter + 3 + d * 6;
-      if (t > MAP.radius - 3) break;
-      const dash = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.02, 2.5), lineMat);
-      dash.position.set(Math.cos(ang) * t, radialY + 0.02, Math.sin(ang) * t);
-      dash.rotation.y = -ang + Math.PI / 2;
-      group.add(dash);
-    }
+    // TẠM TẮT vạch tim xuyên tâm — bật lại khi tối ưu
+    // const dashCount = Math.floor(len / 6);
+    // for (let d = 0; d < dashCount; d++) {
+    //   const t = MAP.roundaboutOuter + 3 + d * 6;
+    //   if (t > MAP.radius - 3) break;
+    //   const dash = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.02, 2.5), lineMat);
+    //   dash.position.set(Math.cos(ang) * t, radialY + 0.02, Math.sin(ang) * t);
+    //   dash.rotation.y = -ang + Math.PI / 2;
+    //   group.add(dash);
+    // }
   }
 
   scene.add(group);
