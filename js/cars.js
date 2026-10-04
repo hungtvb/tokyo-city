@@ -1,7 +1,7 @@
 // cars.js - Xe chạy trên vành đai tròn và đường xuyên tâm
 import * as THREE from 'three';
-import { loadGLB } from './loaders.js?v=2';
-import { MAP } from './streets.js?v=2';
+import { loadGLB } from './loaders.js?v=3';
+import { MAP } from './streets.js?v=3';
 
 const COLORS = ['red', 'blue', 'yellow'];
 let movingCars = [];
