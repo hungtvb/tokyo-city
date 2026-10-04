@@ -1,16 +1,16 @@
 // main.js - Entry point
 import * as THREE from 'three';
-import { createScene } from './scene.js?v=2';
-import { buildTokyoTower } from './tokyo_tower.js?v=2';
-import { buildBuildings } from './buildings.js?v=2';
-import { buildHouses } from './houses.js?v=2';
-import { buildNature } from './nature.js?v=2';
-import { buildStreets } from './streets.js?v=2';
-import { buildCars, updateCars, toggleCars } from './cars.js?v=2';
-import { buildPark } from './park.js?v=2';
-import { buildSupermarket } from './supermarket.js?v=2';
-import { buildSchool } from './school.js?v=2';
-import { buildPlayground } from './playground.js?v=2';
+import { createScene } from './scene.js?v=3';
+import { buildTokyoTower } from './tokyo_tower.js?v=3';
+import { buildBuildings } from './buildings.js?v=3';
+import { buildHouses } from './houses.js?v=3';
+import { buildNature } from './nature.js?v=3';
+import { buildStreets } from './streets.js?v=3';
+import { buildCars, updateCars, toggleCars } from './cars.js?v=3';
+import { buildPark } from './park.js?v=3';
+import { buildSupermarket } from './supermarket.js?v=3';
+import { buildSchool } from './school.js?v=3';
+import { buildPlayground } from './playground.js?v=3';
 
 const { scene, camera, renderer, controls } = createScene();
 
