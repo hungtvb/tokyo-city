@@ -66,10 +66,10 @@ export function buildStreets(scene) {
     const len = MAP.radius - MAP.roundaboutOuter;
     const mid = MAP.roundaboutOuter + len / 2;
 
-    const road = new THREE.Mesh(
-      new THREE.PlaneGeometry(MAP.radialWidth, len), roadMat);
-    road.rotation.x = -Math.PI / 2;
-    road.rotation.z = ang;
+    const roadGeo = new THREE.PlaneGeometry(MAP.radialWidth, len);
+    roadGeo.rotateX(-Math.PI / 2); // làm phẳng trước
+    const road = new THREE.Mesh(roadGeo, roadMat);
+    road.rotation.y = -ang; // xoay quanh trục đứng
     road.position.set(Math.cos(ang) * mid, radialY, Math.sin(ang) * mid);
     road.receiveShadow = true;
     group.add(road);
