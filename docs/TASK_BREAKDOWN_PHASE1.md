@@ -1,7 +1,24 @@
 # TASK BREAKDOWN — Phase 1: Base Map Tròn
-**Trạng thái:** Chờ duyệt | **Ngày tạo:** 2026-10-04
+**Trạng thái:** Chờ duyệt | **Ngày tạo:** 2026-10-04 | **Cập nhật:** 2026-10-04 (bổ sung bài học từ research 3 repo)
 
 > Quy tắc: Task chỉ chuyển sang IMPLEMENT khi Tony duyệt. Không code trước.
+> Nguồn bài học: [RESEARCH_REPOS.md](RESEARCH_REPOS.md) — mauriciopoppe/Three.js-City, catsjuice/random-city, gorgekara/gridburg
+
+---
+
+## Nhóm 0: Module gom geometry (mới — từ bài học research)
+
+### 0.1 Viết `js/batch.js` (gom geometry theo màu)
+- **Output:** `js/batch.js`, export `class Batch`
+- **Nguồn:** catsjuice `geometry.js`, gridburg `meshBuilder.ts`
+- **Nội dung:** `add(geometry, color)` gom vào Map → `build()` merge thành 1 mesh/màu. Xóa `uv`/`tangent` trước merge.
+- **Hàm vẽ sẵn:** `ring(x, z, r0, r1, y, color)`, `ribbon(points, width, y, color)`, `disc(x, z, r, y, color)`
+- **Tiêu chí đạt:** Vẽ 5 ring + 12 ribbon → 2 draw call thay vì 17 mesh
+
+### 0.2 Chuẩn hóa lớp cao độ đường
+- **Nguồn:** catsjuice streets.js
+- **Bảng cao độ:** đất 0 → curb 0.08 → asphalt 0.10 → paint 0.13 → xe 0.20
+- **Tiêu chí đạt:** Mọi module đường/vạch tuân thủ, không z-fighting ở giao lộ
 
 ---
 
@@ -48,16 +65,17 @@
 
 ## Nhóm 3: Đường sá
 
-### 3.1 Viết `js/streets.js` (đường)
+### 3.1 Viết `js/streets.js` (đường) — dùng Batch
 - **Output:** `js/streets.js`, export `buildStreets()`, hằng số `MAP`
+- **Nguồn:** gridburg `MeshBuilder.ring()`, catsjuice `ribbon()`
 - **Thông số MAP:**
   - radius=500, plazaR=15, roundaboutOuter=25
   - rings=[80,160,240,320,400], ringWidth=12
-  - radials=12, radialWidth=10, roadY=0.1
-- **Cao độ:** đất 0 → vành đai/bùng binh 0.10 → xuyên tâm 0.14
-- **Kỹ thuật:** Xuyên tâm dùng `geometry.rotateX(-π/2)` bake phẳng + `rotation.y` (KHÔNG dùng rotation.x+z)
-- **Vạch kẻ:** TẠM BỎ phase 1
-- **Tiêu chí đạt:** Sân tròn, bùng binh, 5 vành, 12 xuyên tâm đúng vị trí
+  - radials=12, radialWidth=10
+- **Kỹ thuật:** Dùng `Batch` từ task 0.1 — 5 vành = 5 lệnh `ring()`, 12 xuyên tâm = 12 `ribbon()`, gom thành 1 mesh asphalt + 1 mesh paint
+- **Cao độ:** theo bảng task 0.2 (asphalt 0.10, paint 0.13)
+- **Vạch kẻ:** TẠM BỎ phase 1 (phase 3 bật lại bằng Batch, không sợ 2500 draw call)
+- **Tiêu chí đạt:** Sân tròn, bùng binh, 5 vành, 12 xuyên tâm đúng vị trí, ≤3 draw call
 
 ### 3.2 Viết `getBlockCenters()`
 - **Output:** Hàm trong streets.js, trả về 60 block `{x, z, angle, type}`
@@ -109,7 +127,8 @@
 - **Output:** 16 xe (12 vành đai + 4 xuyên tâm)
 - **Xe vành đai:** chuyển động tròn, `rotation.y = atan2(-cos·dir, -sin·dir)`
 - **Xe xuyên tâm:** đi thẳng, `rotation.y = -angle` (đi ra) hoặc `-angle+π` (đi vào)
-- **Kỹ thuật:** Đầu xe +X (đã xác minh bằng trụ A)
+- **Kỹ thuật:** Đầu xe +X (đã xác minh bằng trụ A). Tốc độ theo `v = min(vMax, √(aLat·R))` — vành trong chậm, vành ngoài nhanh (nguồn: gridburg driver-model)
+- **Lưu ý phase sau:** Chuyển sang InstancedMesh + DynamicDrawUsage khi tăng số xe (nguồn: catsjuice renderer.js). Đèn xe làm part của geometry, không mesh riêng.
 - **Tiêu chí đạt:** Xe ở y=0.20, đúng làn
 
 ### 5.2 Verify hướng xe
@@ -141,4 +160,14 @@
 
 ---
 
-**Tổng: 19 task | Trạng thái: CHỜ DUYỆT**
+**Tổng: 21 task (thêm Nhóm 0: 2 task) | Trạng thái: CHỜ DUYỆT**
+
+---
+
+## Phụ lục: Bài học phase sau (từ research, chưa áp dụng)
+
+- **Shadow tĩnh:** `sun.shadow.autoUpdate = false` — render 1 lần cho scene tĩnh (nguồn: gridburg scene.ts)
+- **Đêm không PointLight:** bake irradiance texture + billboard glow (nguồn: catsjuice lighting.js)
+- **Xe từ side profile:** nặn xe cong thay vì hộp (nguồn: gridburg carShell.ts)
+- **ACES tone mapping:** màu điện ảnh cho desktop (nguồn: gridburg)
+- **TSL:** chưa áp dụng — chỉ dùng khi cần shader phức tạp (nước, thời tiết, particle)
