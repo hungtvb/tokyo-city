@@ -1,7 +1,7 @@
 // nature.js - Cây xanh: công viên vành 4 + điểm xuyết các vành khác
 import * as THREE from 'three';
-import { loadGLB } from './loaders.js';
-import { getBlockCenters, MAP } from './streets.js';
+import { loadGLB } from './loaders.js?v=3';
+import { getBlockCenters, MAP } from './streets.js?v=3';
 
 export async function buildNature(scene) {
   const model = await loadGLB('models/sakura.glb');
