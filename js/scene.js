@@ -7,8 +7,7 @@ export function createScene() {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFShadowMap; // nhẹ hơn PCFSoft
+  renderer.shadowMap.enabled = false; // TẮT shadow để test nhấp nháy
 
   const scene = new THREE.Scene();
   // Trời xanh ban ngày Tokyo
