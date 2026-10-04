@@ -13,10 +13,10 @@ export function createScene() {
   const scene = new THREE.Scene();
   // Trời xanh ban ngày Tokyo
   scene.background = new THREE.Color(0x87CEEB);
-  scene.fog = new THREE.Fog(0x87CEEB, 150, 400);
+  scene.fog = new THREE.Fog(0x87CEEB, 300, 900);
 
-  const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 1000);
-  camera.position.set(60, 40, 60);
+  const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 3000);
+  camera.position.set(250, 180, 250);
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.target.set(0, 10, 0);
@@ -28,16 +28,16 @@ export function createScene() {
   sun.position.set(50, 80, 30);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
-  sun.shadow.camera.left = -100; sun.shadow.camera.right = 100;
-  sun.shadow.camera.top = 100; sun.shadow.camera.bottom = -100;
+  sun.shadow.camera.left = -550; sun.shadow.camera.right = 550;
+  sun.shadow.camera.top = 550; sun.shadow.camera.bottom = -550;
   sun.shadow.bias = -0.0002;
   sun.shadow.normalBias = 0.6;
   scene.add(sun);
   scene.add(new THREE.HemisphereLight(0xbfe3ff, 0x8a7f70, 0.8));
 
-  // Đất nền
+  // Đất nền hình tròn (map tròn bán kính 500m + lề)
   const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(800, 800),
+    new THREE.CircleGeometry(650, 64),
     new THREE.MeshStandardMaterial({ color: 0x7a9a6a, roughness: 1 })
   );
   ground.rotation.x = -Math.PI/2;
