@@ -1,57 +1,128 @@
-// streets.js - Đường và đèn đường
+// streets.js - Mạng lưới đường tròn: bùng binh trung tâm + 3 vành đai + 8 xuyên tâm
 import * as THREE from 'three';
-import { loadGLB } from './loaders.js';
 
-export async function buildStreets(scene) {
+// Cấu hình map tròn
+export const MAP = {
+  radius: 500,           // bán kính map (1km đường kính)
+  plazaR: 15,            // sân tháp trung tâm
+  roundaboutOuter: 25,   // bùng binh: từ 15m đến 25m
+  rings: [80, 160, 240, 320, 400], // bán kính tim 5 vành đai
+  ringWidth: 12,         // rộng đường vành đai
+  radials: 12,           // số đường xuyên tâm
+  radialWidth: 10,       // rộng đường xuyên tâm
+  roadY: 0.1,            // cao độ mặt đường
+};
+
+export function buildStreets(scene) {
   const group = new THREE.Group();
-  
-  // Đường nhựa (grid)
-  const roadMat = new THREE.MeshStandardMaterial({ color: 0x2a2a2c, roughness: 0.95 });
-  const lineMat = new THREE.MeshStandardMaterial({ color: 0xf5f5f5, roughness: 0.8 });
-  
-  // 2 đường chính cắt nhau
-  for (const [w, d, x, z] of [[200, 10, 0, 0], [10, 200, 0, 0]]) {
-    const road = new THREE.Mesh(new THREE.BoxGeometry(w, 0.2, d), roadMat);
-    road.position.set(x, 0.1, z);
+  const roadMat = new THREE.MeshStandardMaterial({ color: 0x2b2f36, roughness: 0.95 });
+  const lineMat = new THREE.MeshBasicMaterial({ color: 0xf5f5f5 });
+  const plazaMat = new THREE.MeshStandardMaterial({ color: 0x9aa0a8, roughness: 0.9 });
+
+  const y = MAP.roadY;
+
+  // 1. Sân tháp trung tâm (vỉa hè tròn)
+  const plaza = new THREE.Mesh(new THREE.CircleGeometry(MAP.plazaR, 48), plazaMat);
+  plaza.rotation.x = -Math.PI / 2;
+  plaza.position.y = y;
+  plaza.receiveShadow = true;
+  group.add(plaza);
+
+  // 2. Bùng binh quanh tháp
+  const roundabout = new THREE.Mesh(
+    new THREE.RingGeometry(MAP.plazaR, MAP.roundaboutOuter, 64), roadMat);
+  roundabout.rotation.x = -Math.PI / 2;
+  roundabout.position.y = y;
+  roundabout.receiveShadow = true;
+  group.add(roundabout);
+
+  // Vạch kẻ bùng binh (vòng tròn đứt)
+  addDashedCircle(group, (MAP.plazaR + MAP.roundaboutOuter) / 2, y + 0.01, lineMat);
+
+  // 3. 3 đường vành đai
+  for (const r of MAP.rings) {
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(r - MAP.ringWidth / 2, r + MAP.ringWidth / 2, 96), roadMat);
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.y = y;
+    ring.receiveShadow = true;
+    group.add(ring);
+
+    // Vạch tim đường đứt
+    addDashedCircle(group, r, y + 0.01, lineMat);
+    // Vạch biên liền 2 mép
+    for (const er of [r - MAP.ringWidth / 2 + 0.3, r + MAP.ringWidth / 2 - 0.3]) {
+      const edge = new THREE.Mesh(new THREE.RingGeometry(er - 0.15, er + 0.15, 96),
+        new THREE.MeshBasicMaterial({ color: 0xf5f5f5 }));
+      edge.rotation.x = -Math.PI / 2;
+      edge.position.y = y + 0.01;
+      group.add(edge);
+    }
+  }
+
+  // 4. 8 đường xuyên tâm
+  for (let i = 0; i < MAP.radials; i++) {
+    const ang = (i / MAP.radials) * Math.PI * 2;
+    const len = MAP.radius - MAP.roundaboutOuter;
+    const mid = MAP.roundaboutOuter + len / 2;
+
+    const road = new THREE.Mesh(
+      new THREE.BoxGeometry(MAP.radialWidth, 0.2, len), roadMat);
+    road.position.set(Math.cos(ang) * mid, y, Math.sin(ang) * mid);
+    road.rotation.y = -ang + Math.PI / 2;
     road.receiveShadow = true;
     group.add(road);
-  }
-  // Vạch kẻ đường
-  for (let i = -90; i <= 90; i += 8) {
-    if (Math.abs(i) < 8) continue; // bỏ qua ngã tư
-    const l1 = new THREE.Mesh(new THREE.BoxGeometry(3, 0.05, 0.3), lineMat);
-    l1.position.set(i, 0.26, 0);
-    group.add(l1);
-    const l2 = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.05, 3), lineMat);
-    l2.position.set(0, 0.26, i);
-    group.add(l2);
-  }
-  // Vạch qua đường Shibuya (ngã tư)
-  for (let i = -4; i <= 4; i++) {
-    const s = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.05, 8), lineMat);
-    s.position.set(i * 2, 0.26, 0);
-    group.add(s);
-  }
-  
-  // Đèn đường
-  const lampModel = await loadGLB('models/streetlight.glb');
-  for (let i = -80; i <= 80; i += 40) {
-    for (const [x, z, rot] of [[i, 7, 0], [i, -7, Math.PI]]) {
-      if (Math.abs(i) < 10) continue;
-      const lamp = lampModel.clone();
-      lamp.position.set(x, 0, z);
-      lamp.rotation.y = rot;
-      group.add(lamp);
-    }
-    for (const [x, z, rot] of [[7, i, -Math.PI/2], [-7, i, Math.PI/2]]) {
-      if (Math.abs(i) < 10) continue;
-      const lamp = lampModel.clone();
-      lamp.position.set(x, 0, z);
-      lamp.rotation.y = rot;
-      group.add(lamp);
+
+    // Vạch tim đứt
+    const dashCount = Math.floor(len / 6);
+    for (let d = 0; d < dashCount; d++) {
+      const t = MAP.roundaboutOuter + 3 + d * 6;
+      if (t > MAP.radius - 3) break;
+      const dash = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.02, 2.5), lineMat);
+      dash.position.set(Math.cos(ang) * t, y + 0.02, Math.sin(ang) * t);
+      dash.rotation.y = -ang + Math.PI / 2;
+      group.add(dash);
     }
   }
-  
+
   scene.add(group);
   return group;
+}
+
+// Vòng tròn đứt nét (vạch kẻ đường cong)
+function addDashedCircle(group, radius, y, mat) {
+  const count = Math.floor((Math.PI * 2 * radius) / 6);
+  for (let i = 0; i < count; i++) {
+    const a = (i / count) * Math.PI * 2;
+    const dash = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.02, 2.5), mat);
+    dash.position.set(Math.cos(a) * radius, y, Math.sin(a) * radius);
+    dash.rotation.y = -a + Math.PI / 2;
+    group.add(dash);
+  }
+}
+
+// Trả về tâm các block (để đặt nhà) — mỗi block nằm giữa 2 vành đai và 2 xuyên tâm
+export function getBlockCenters() {
+  const blocks = [];
+  // 5 vành: văn phòng → thương mại → dân cư → công viên → ven đô
+  const zones = [
+    { r0: 32, r1: 70, type: 'office' },    // quanh tháp: cao ốc
+    { r0: 90, r1: 150, type: 'commercial' }, // thương mại: siêu thị, cửa hàng
+    { r0: 170, r1: 230, type: 'residential' }, // dân cư: nhà + trường học
+    { r0: 250, r1: 310, type: 'park' },     // công viên + hồ nước
+    { r0: 330, r1: 390, type: 'garden' },   // ven đô: nhà vườn + khu vui chơi
+  ];
+  for (const z of zones) {
+    const rMid = (z.r0 + z.r1) / 2;
+    for (let i = 0; i < MAP.radials; i++) {
+      const ang = ((i + 0.5) / MAP.radials) * Math.PI * 2;
+      blocks.push({
+        x: Math.cos(ang) * rMid,
+        z: Math.sin(ang) * rMid,
+        angle: ang,
+        type: z.type,
+      });
+    }
+  }
+  return blocks;
 }
