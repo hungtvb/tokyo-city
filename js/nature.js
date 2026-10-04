@@ -13,7 +13,7 @@ export async function buildNature(scene) {
     if (b.type === 'park') {
       // Công viên: 1 cây mỗi block (tạm low-poly, nâng cấp sau)
       const t = model.clone();
-      t.position.set(b.x, 0, b.z);
+      t.position.set(b.x, 0.05, b.z);
       t.rotation.y = Math.random() * Math.PI * 2;
       t.scale.setScalar(0.7 + Math.random() * 0.3);
       group.add(t);
