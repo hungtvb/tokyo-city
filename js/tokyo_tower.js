@@ -1,5 +1,5 @@
 // tokyo_tower.js
-import { loadGLB } from './loaders.js';
+import { loadGLB } from './loaders.js?v=3';
 
 export async function buildTokyoTower(scene) {
   const tower = await loadGLB('models/tokyo_tower.glb');
