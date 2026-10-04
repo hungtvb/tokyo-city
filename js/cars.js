@@ -1,20 +1,11 @@
-// cars.js - Xe đậu và xe chạy
+// cars.js - Xe chạy trên vành đai tròn và đường xuyên tâm
 import * as THREE from 'three';
 import { loadGLB } from './loaders.js';
+import { MAP } from './streets.js';
 
 const COLORS = ['red', 'blue', 'yellow'];
 let movingCars = [];
 let carsEnabled = true;
-
-// Đường xe chạy: vòng quanh 2 trục đường chính
-const PATHS = [
-  // Đường ngang (z=2.5 và z=-2.5)
-  { axis: 'x', fixed: 2.5, from: -95, to: 95, dir: 1 },
-  { axis: 'x', fixed: -2.5, from: 95, to: -95, dir: -1 },
-  // Đường dọc (x=2.5 và x=-2.5)
-  { axis: 'z', fixed: 2.5, from: -95, to: 95, dir: 1 },
-  { axis: 'z', fixed: -2.5, from: 95, to: -95, dir: -1 },
-];
 
 export async function buildCars(scene) {
   const models = {};
@@ -22,31 +13,37 @@ export async function buildCars(scene) {
     models[c] = await loadGLB(`models/jp_car_${c}.glb`);
   }
   const group = new THREE.Group();
-  
-  // Xe đậu (bãi đậu xe)
-  const parked = [
-    [-60, 15, 0, 'red'], [-60, 20, 0, 'blue'], [-60, 25, 0, 'yellow'],
-    [42, -12, Math.PI, 'blue'], [42, -17, Math.PI, 'red'],
-    [-15, 50, Math.PI/2, 'yellow'], [15, -50, -Math.PI/2, 'red'],
-  ];
-  for (const [x, z, rot, color] of parked) {
-    const car = models[color].clone();
-    car.position.set(x, 0, z);
-    car.rotation.y = rot;
-    group.add(car);
+
+  // Xe chạy trên các vành đai (mỗi vành 2 xe ngược chiều)
+  const ringRadii = [...MAP.rings, (MAP.plazaR + MAP.roundaboutOuter) / 2];
+  let ci = 0;
+  for (const r of ringRadii) {
+    for (const dir of [1, -1]) {
+      const car = models[COLORS[ci++ % 3]].clone();
+      car.userData = {
+        kind: 'ring', radius: r, dir,
+        angle: Math.random() * Math.PI * 2,
+        speed: (0.02 + Math.random() * 0.015) * dir, // rad/frame
+      };
+      group.add(car);
+      movingCars.push(car);
+    }
   }
-  
-  // Xe chạy (8 xe, 2 xe mỗi làn)
-  for (let i = 0; i < 8; i++) {
-    const path = PATHS[i % 4];
-    const color = COLORS[i % 3];
-    const car = models[color].clone();
-    const t = Math.random(); // vị trí ngẫu nhiên trên đường
-    car.userData = { path, t, speed: 0.008 + Math.random() * 0.004 };
+
+  // Xe chạy trên 4 đường xuyên tâm (mỗi đường 1 xe)
+  for (let i = 0; i < 4; i++) {
+    const ang = (i / 4) * Math.PI * 2 + Math.PI / MAP.radials;
+    const car = models[COLORS[ci++ % 3]].clone();
+    const dir = i % 2 === 0 ? 1 : -1;
+    car.userData = {
+      kind: 'radial', angle: ang, dir,
+      t: MAP.roundaboutOuter + Math.random() * (MAP.radius - MAP.roundaboutOuter - 20),
+      speed: (0.6 + Math.random() * 0.4) * dir, // m/frame
+    };
     group.add(car);
     movingCars.push(car);
   }
-  
+
   scene.add(group);
   return group;
 }
@@ -54,18 +51,23 @@ export async function buildCars(scene) {
 export function updateCars() {
   if (!carsEnabled) return;
   for (const car of movingCars) {
-    const { path, speed } = car.userData;
-    car.userData.t += speed * path.dir;
-    if (car.userData.t > 1) car.userData.t = 0;
-    if (car.userData.t < 0) car.userData.t = 1;
-    
-    const pos = path.from + (path.to - path.from) * car.userData.t;
-    if (path.axis === 'x') {
-      car.position.set(pos, 0.2, path.fixed);
-      car.rotation.y = path.dir > 0 ? 0 : Math.PI;
+    const u = car.userData;
+    if (u.kind === 'ring') {
+      u.angle += u.speed * 0.01;
+      const x = Math.cos(u.angle) * u.radius;
+      const z = Math.sin(u.angle) * u.radius;
+      car.position.set(x, 0.2, z);
+      // Hướng tiếp tuyến: forward +X → tiếp tuyến vòng tròn
+      car.rotation.y = Math.atan2(-Math.cos(u.angle) * u.dir, -Math.sin(u.angle) * u.dir);
     } else {
-      car.position.set(path.fixed, 0.2, pos);
-      car.rotation.y = path.dir > 0 ? -Math.PI/2 : Math.PI/2;
+      u.t += u.speed;
+      if (u.t > MAP.radius - 10) u.t = MAP.roundaboutOuter + 5;
+      if (u.t < MAP.roundaboutOuter + 5) u.t = MAP.radius - 10;
+      const x = Math.cos(u.angle) * u.t;
+      const z = Math.sin(u.angle) * u.t;
+      car.position.set(x, 0.2, z);
+      // Hướng dọc theo xuyên tâm (đầu xe +X)
+      car.rotation.y = u.dir > 0 ? -u.angle : -u.angle + Math.PI;
     }
   }
 }
