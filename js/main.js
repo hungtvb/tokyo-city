@@ -1,12 +1,16 @@
 // main.js - Entry point
 import * as THREE from 'three';
-import { createScene } from './scene.js?v=1';
-import { buildTokyoTower } from './tokyo_tower.js?v=1';
-import { buildBuildings } from './buildings.js?v=1';
-import { buildHouses } from './houses.js?v=1';
-import { buildNature } from './nature.js?v=1';
-import { buildStreets } from './streets.js?v=1';
-import { buildCars, updateCars, toggleCars } from './cars.js?v=1';
+import { createScene } from './scene.js?v=2';
+import { buildTokyoTower } from './tokyo_tower.js?v=2';
+import { buildBuildings } from './buildings.js?v=2';
+import { buildHouses } from './houses.js?v=2';
+import { buildNature } from './nature.js?v=2';
+import { buildStreets } from './streets.js?v=2';
+import { buildCars, updateCars, toggleCars } from './cars.js?v=2';
+import { buildPark } from './park.js?v=2';
+import { buildSupermarket } from './supermarket.js?v=2';
+import { buildSchool } from './school.js?v=2';
+import { buildPlayground } from './playground.js?v=2';
 
 const { scene, camera, renderer, controls } = createScene();
 
@@ -30,6 +34,10 @@ async function init() {
     ['Cây sakura', buildNature],
     ['Đường phố', buildStreets],
     ['Xe cộ', buildCars],
+    ['Công viên', buildPark],
+    ['Siêu thị', buildSupermarket],
+    ['Trường học', buildSchool],
+    ['Khu vui chơi', buildPlayground],
   ];
   for (let i = 0; i < steps.length; i++) {
     const [label, fn] = steps[i];
