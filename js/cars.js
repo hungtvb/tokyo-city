@@ -62,10 +62,10 @@ export function updateCars() {
     const pos = path.from + (path.to - path.from) * car.userData.t;
     if (path.axis === 'x') {
       car.position.set(pos, 0.2, path.fixed);
-      car.rotation.y = path.dir > 0 ? Math.PI/2 : -Math.PI/2;
+      car.rotation.y = path.dir > 0 ? 0 : Math.PI;
     } else {
       car.position.set(path.fixed, 0.2, pos);
-      car.rotation.y = path.dir > 0 ? 0 : Math.PI;
+      car.rotation.y = path.dir > 0 ? -Math.PI/2 : Math.PI/2;
     }
   }
 }
