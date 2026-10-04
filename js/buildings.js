@@ -20,7 +20,7 @@ export async function buildBuildings(scene) {
 
     const v = variants[vi++ % 3];
     const m = models[v].clone();
-    m.position.set(b.x, 0, b.z);
+    m.position.set(b.x, 0.05, b.z);
     m.rotation.y = -b.angle + Math.PI / 2;
     // Vành 2 thấp hơn vành 1
     if (b.type === 'commercial') m.scale.setScalar(0.7);
