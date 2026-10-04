@@ -44,12 +44,12 @@ async function init() {
     document.getElementById('menu-panel').classList.toggle('open');
   };
   document.getElementById('btn-cam1').onclick = () => {
-    camera.position.set(60, 30, 60);
-    controls.target.set(28, 15, 28);
+    camera.position.set(60, 35, 60);
+    controls.target.set(0, 20, 0); // tháp trung tâm
   };
   document.getElementById('btn-cam2').onclick = () => {
-    camera.position.set(100, 80, 100);
-    controls.target.set(0, 0, 0);
+    camera.position.set(350, 280, 350);
+    controls.target.set(0, 0, 0); // toàn cảnh map 1km
   };
   document.getElementById('btn-free').onclick = () => {
     document.getElementById('menu-panel').classList.remove('open');
