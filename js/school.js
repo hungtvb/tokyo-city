@@ -1,8 +1,8 @@
 // school.js - Trường học Nhật Bản (vành 3, residential)
 import * as THREE from 'three';
-import { Batch } from './batch.js?v=2';
-import { LAYER_Y, COLORS } from './config.js?v=2';
-import { getBlockCenters } from './streets.js?v=2';
+import { Batch } from './batch.js?v=3';
+import { LAYER_Y, COLORS } from './config.js?v=3';
+import { getBlockCenters } from './streets.js?v=3';
 
 export async function buildSchool(scene) {
   const group = new THREE.Group();
