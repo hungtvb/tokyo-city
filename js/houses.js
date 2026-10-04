@@ -1,7 +1,7 @@
 // houses.js - Nhà Nhật đặt theo block của map tròn
 import * as THREE from 'three';
-import { loadGLB } from './loaders.js';
-import { getBlockCenters } from './streets.js';
+import { loadGLB } from './loaders.js?v=3';
+import { getBlockCenters } from './streets.js?v=3';
 
 export async function buildHouses(scene) {
   const model = await loadGLB('models/jp_house.glb');
