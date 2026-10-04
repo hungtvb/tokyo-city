@@ -1,7 +1,7 @@
 // buildings.js - Tòa văn phòng đặt theo block của map tròn
 import * as THREE from 'three';
-import { loadGLB } from './loaders.js?v=1';
-import { getBlockCenters } from './streets.js?v=1';
+import { loadGLB } from './loaders.js?v=3';
+import { getBlockCenters } from './streets.js?v=3';
 
 export async function buildBuildings(scene) {
   const models = {
@@ -22,8 +22,9 @@ export async function buildBuildings(scene) {
     const m = models[v].clone();
     m.position.set(b.x, 0.05, b.z);
     m.rotation.y = -b.angle + Math.PI / 2;
-    // Vành 2 thấp hơn vành 1
-    if (b.type === 'commercial') m.scale.setScalar(0.7);
+    // Scale vừa block: office 120m -> 14m (block 16.7m), commercial -> 42m (block 52.8m)
+    if (b.type === 'office') m.scale.setScalar(0.12);
+    else if (b.type === 'commercial') m.scale.setScalar(0.35);
     group.add(m);
   }
 
