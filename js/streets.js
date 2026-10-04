@@ -37,7 +37,7 @@ export function buildStreets(scene) {
   group.add(roundabout);
 
   // Vạch kẻ bùng binh (vòng tròn đứt)
-  addDashedCircle(group, (MAP.plazaR + MAP.roundaboutOuter) / 2, y + 0.01, lineMat);
+  addDashedCircle(group, (MAP.plazaR + MAP.roundaboutOuter) / 2, y + 0.05, lineMat);
 
   // 3. 3 đường vành đai
   for (const r of MAP.rings) {
@@ -49,13 +49,13 @@ export function buildStreets(scene) {
     group.add(ring);
 
     // Vạch tim đường đứt
-    addDashedCircle(group, r, y + 0.01, lineMat);
+    addDashedCircle(group, r, y + 0.05, lineMat);
     // Vạch biên liền 2 mép
     for (const er of [r - MAP.ringWidth / 2 + 0.3, r + MAP.ringWidth / 2 - 0.3]) {
       const edge = new THREE.Mesh(new THREE.RingGeometry(er - 0.15, er + 0.15, 96),
         new THREE.MeshBasicMaterial({ color: 0xf5f5f5 }));
       edge.rotation.x = -Math.PI / 2;
-      edge.position.y = y + 0.01;
+      edge.position.y = y + 0.05;
       group.add(edge);
     }
   }
@@ -79,7 +79,7 @@ export function buildStreets(scene) {
       const t = MAP.roundaboutOuter + 3 + d * 6;
       if (t > MAP.radius - 3) break;
       const dash = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.02, 2.5), lineMat);
-      dash.position.set(Math.cos(ang) * t, y + 0.02, Math.sin(ang) * t);
+      dash.position.set(Math.cos(ang) * t, y + 0.05, Math.sin(ang) * t);
       dash.rotation.y = -ang + Math.PI / 2;
       group.add(dash);
     }
