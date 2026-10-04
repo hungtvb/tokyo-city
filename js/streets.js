@@ -1,8 +1,8 @@
 // streets.js - Mạng lưới đường tròn dùng Batch (gom geometry)
 // Nguồn: gridburg MeshBuilder.ring(), catsjuice ribbon()
 import * as THREE from 'three';
-import { Batch } from './batch.js?v=2';
-import { MAP, LAYER_Y, COLORS } from './config.js?v=2';
+import { Batch } from './batch.js?v=3';
+import { MAP, LAYER_Y, COLORS } from './config.js?v=3';
 
 export { MAP };
 
