@@ -12,7 +12,7 @@ export function createScene() {
   const scene = new THREE.Scene();
   // Trời xanh ban ngày Tokyo
   scene.background = new THREE.Color(0x87CEEB);
-  scene.fog = new THREE.Fog(0x87CEEB, 300, 900);
+  // Bỏ fog theo yêu cầu (gây vệt trắng trên iPhone)
 
   const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 2, 1500);
   camera.position.set(250, 180, 250);
