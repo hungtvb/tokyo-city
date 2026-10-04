@@ -1,15 +1,7 @@
-// buildings.js - Tòa văn phòng
+// buildings.js - Tòa văn phòng đặt theo block của map tròn
 import * as THREE from 'three';
 import { loadGLB } from './loaders.js';
-
-const POSITIONS = [
-  // [x, z, variant, rotY]
-  [-45, -30, 'a', 0], [45, -30, 'b', 0],
-  [-45, 30, 'c', 0], [45, 30, 'a', Math.PI/2],
-  [-80, -60, 'b', 0], [80, -60, 'c', 0],
-  [-80, 60, 'a', 0], [80, 60, 'b', Math.PI/2],
-  [20, -70, 'c', 0], [-20, 70, 'a', 0],
-];
+import { getBlockCenters } from './streets.js';
 
 export async function buildBuildings(scene) {
   const models = {
@@ -18,12 +10,23 @@ export async function buildBuildings(scene) {
     c: await loadGLB('models/office_c.glb'),
   };
   const group = new THREE.Group();
-  for (const [x, z, v, rot] of POSITIONS) {
-    const b = models[v].clone();
-    b.position.set(x, 0, z);
-    b.rotation.y = rot;
-    group.add(b);
+  const variants = ['a', 'b', 'c'];
+  let vi = 0;
+
+  const blocks = getBlockCenters();
+  for (const b of blocks) {
+    // Vành 1: văn phòng cao tầng; vành 2: thương mại (tạm dùng văn phòng low-poly)
+    if (b.type !== 'office' && b.type !== 'commercial') continue;
+
+    const v = variants[vi++ % 3];
+    const m = models[v].clone();
+    m.position.set(b.x, 0, b.z);
+    m.rotation.y = -b.angle + Math.PI / 2;
+    // Vành 2 thấp hơn vành 1
+    if (b.type === 'commercial') m.scale.setScalar(0.7);
+    group.add(m);
   }
+
   scene.add(group);
   return group;
 }
