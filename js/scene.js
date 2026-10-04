@@ -30,12 +30,14 @@ export function createScene() {
   sun.shadow.mapSize.set(2048, 2048);
   sun.shadow.camera.left = -100; sun.shadow.camera.right = 100;
   sun.shadow.camera.top = 100; sun.shadow.camera.bottom = -100;
+  sun.shadow.bias = -0.0002;
+  sun.shadow.normalBias = 0.6;
   scene.add(sun);
   scene.add(new THREE.HemisphereLight(0xbfe3ff, 0x8a7f70, 0.8));
 
   // Đất nền
   const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(400, 400),
+    new THREE.PlaneGeometry(800, 800),
     new THREE.MeshStandardMaterial({ color: 0x7a9a6a, roughness: 1 })
   );
   ground.rotation.x = -Math.PI/2;
