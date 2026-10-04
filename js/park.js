@@ -1,9 +1,9 @@
 // park.js - Công viên + hồ nước (vành 4)
 import * as THREE from 'three';
-import { loadGLB } from './loaders.js?v=2';
-import { Batch } from './batch.js?v=2';
-import { LAYER_Y, COLORS } from './config.js?v=2';
-import { getBlockCenters, MAP } from './streets.js?v=2';
+import { loadGLB } from './loaders.js?v=3';
+import { Batch } from './batch.js?v=3';
+import { LAYER_Y, COLORS } from './config.js?v=3';
+import { getBlockCenters, MAP } from './streets.js?v=3';
 
 export async function buildPark(scene) {
   const group = new THREE.Group();
