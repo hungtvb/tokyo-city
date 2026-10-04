@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 export function createScene() {
   const canvas = document.getElementById('scene');
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: false }); // tắt antialias test vệt trắng
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.shadowMap.enabled = false; // TẮT shadow để test nhấp nháy
@@ -34,9 +34,9 @@ export function createScene() {
   scene.add(sun);
   scene.add(new THREE.HemisphereLight(0xbfe3ff, 0x8a7f70, 0.8));
 
-  // Đất nền hình tròn (map tròn bán kính 500m + lề)
+  // Đất nền hình tròn (vừa đủ map 500m + lề nhỏ để giảm lỗi precision)
   const ground = new THREE.Mesh(
-    new THREE.CircleGeometry(650, 64),
+    new THREE.CircleGeometry(560, 48),
     new THREE.MeshStandardMaterial({ color: 0x7a9a6a, roughness: 1 })
   );
   ground.rotation.x = -Math.PI/2;
